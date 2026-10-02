@@ -19,13 +19,11 @@ public class UtilsViews {
 
     // Add one view to the list
     public static void addView(Class<?> cls, String name, String path) throws Exception {
-        
         boolean defaultView = false;
         FXMLLoader loader = new FXMLLoader(cls.getResource(path));
         Pane view = loader.load();
         ObservableList<Node> children = parentContainer.getChildren();
 
-        // First view is the default view
         if (children.isEmpty()) {
             defaultView = true;
         }
@@ -34,18 +32,21 @@ public class UtilsViews {
         view.setVisible(defaultView);
         view.setManaged(defaultView);
 
+        // === LÍNEA CLAVE AÑADIDA: Guardamos el controlador dentro de la propia vista ===
+        view.setUserData(loader.getController());
+        // ==============================================================================
+
         children.add(view);
         controllers.add(loader.getController());
     }
 
     // Get controller by view id (viewId)
     public static Object getController(String viewId) {
-        int index = 0;
         for (Node n : parentContainer.getChildren()) {
-            if (n.getId().equals(viewId)) {
-                return controllers.get(index);
+            if (n.getId() != null && n.getId().equals(viewId)) {
+                // Devolvemos el controlador real asociado directamente a este nodo
+                return n.getUserData();
             }
-            index++;
         }
         return null;
     }
@@ -60,13 +61,11 @@ public class UtilsViews {
         return null; // No hi ha cap vista activa
     }
 
-    // Set visible view by its id (viewId)
     public static void setView(String viewId) {
-
         ArrayList<Node> list = new ArrayList<>();
         list.addAll(parentContainer.getChildrenUnmodifiable());
 
-        // Show next view, hide others
+        // Mostramos la vista seleccionada y ocultamos las demás
         for (Node n : list) {
             if (n.getId().equals(viewId)) {
                 n.setVisible(true);
@@ -77,7 +76,21 @@ public class UtilsViews {
             }
         }
 
-        // Remove focus from buttons
+        // === SOLUCIÓN ANTIFALLOS: Refrescar los datos de manera independiente ===
+        if (viewId.equals("VistaB")) {
+            for (int i = 0; i < parentContainer.getChildren().size(); i++) {
+                Node n = parentContainer.getChildren().get(i);
+                // Buscamos el nodo que se llama VistaB para recuperar su controlador correspondiente
+                if ("VistaB".equals(n.getId())) {
+                    Object ctrl = controllers.get(i);
+                    if (ctrl instanceof ControllerVistaB) {
+                        ((ControllerVistaB) ctrl).actualitzarDades();
+                    }
+                }
+            }
+        }
+        // =======================================================================
+
         parentContainer.requestFocus();
     }
 
