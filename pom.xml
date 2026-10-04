@@ -4,6 +4,13 @@
     <groupId>com.example</groupId>
     <artifactId>project-name</artifactId>
     <version>1.0.0</version>
+    
+    <!-- Añadimos esto para que el script encuentre siempre tu clase principal -->
+    <properties>
+        <exec.mainClass>com.project.Main</exec.mainClass>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -56,7 +63,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20220924</version> <!-- This seems to be a future date, please ensure it's the correct version -->
+            <version>20220924</version>
         </dependency>
         <!-- Dependencies for SLF4J -->
         <dependency>
@@ -80,7 +87,8 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <version>1.6.0</version>
                         <configuration>
-                            <mainClass>${exec.mainClass}</mainClass>
+                            <!-- Quitamos la variable antigua y ponemos tu clase fija -->
+                            <mainClass>com.project.Main</mainClass>
                         </configuration>
                     </plugin>
                 </plugins>
